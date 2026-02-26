@@ -8,10 +8,10 @@ class AuthController{
     private $db;
 
     public function __construct() {
-        $host = 'mysql-tmz-auth.alwaysdata.net';
-        $db = 'tmz-auth_r401auth';
-        $user = 'tmz-auth';
-        $pass = 'xtJ!8uXccGwuyAneUtgZ';
+        $host = $_ENV['DB_HOST'];
+        $db = $_ENV['DB_NAME'];
+        $user = $_ENV['DB_USER'];
+        $pass = $_ENV['DB_PASS'];
 
         $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
         $this->db = new PDO($dsn, $user, $pass, [
