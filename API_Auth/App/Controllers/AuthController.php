@@ -35,15 +35,15 @@ class AuthController{
 
         // 1. Recherche de l'utilisateur
         $stmt = $this->db->prepare("SELECT * FROM Utilisateur WHERE Email = :email");
-        $stmt->execute(['email' => $data->emain]);
+        $stmt->execute(['email' => $data->email]);
         $user = $stmt->fetch();
 
         // 2. Vérification du mot de passe
-        if ($user && password_verify($data->password, $user['MotDePasse'])) {
+        if ($user && password_verify($data->password, $user['MotDePasseHash'])) {
             
             // 3. Création du Token JWT
             $secret_key = "";
-            $issuer_claim = "tmz-auth.alwaysdata.net";
+            $issuer_claim = $_ENV['DB_HOST'];
             $issuedat_claim = time();
             $expire_claim = $issuedat_claim + 3600;
 

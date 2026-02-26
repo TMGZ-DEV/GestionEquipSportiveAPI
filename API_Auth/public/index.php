@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-if ($uri === '/login' && method === 'POST') {
+if ($uri === '/login' && $method === 'POST') {
     $controller = new AuthController();
     $controller->login();
 } else {
