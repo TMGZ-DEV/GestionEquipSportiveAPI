@@ -12,15 +12,19 @@ class AuthMiddleware
     // Stoppe l'exécution si le token est invalide
     public static function verifierToken()
     {
+        $authHeader = '';
 
-        // Récupération des en-têtes HTTP
-        $headers = apache_request_headers();
-
-        // Recherche du header Authorization
-        $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $authHeader = trim($_SERVER['HTTP_AUTHORIZATION']);
+        } elseif (function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $authHeader = trim($headers['Authorization']);
+            }
+        }
 
         // Format attendu "Bearer <token>"
-        if (!$authHeader || !preg_match('/Bearer\s(s\S+)/', $authHeader, $matches)) {
+        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
             http_response_code(401);
             echo json_encode(["message" => "Accès refusé. Jeton d'authentification manquant ou mal formaté"]);
             exit;
@@ -31,7 +35,7 @@ class AuthMiddleware
 
         // Récuperation de la clé secrète depuis le .env
         $secret_key = $_ENV['JWT_SECRET'];
-
+    
         try {
 
             // Firebase verifie automatiquement la signature et la date d'expiration
@@ -41,7 +45,10 @@ class AuthMiddleware
             return $decoded->data;
         } catch (Exception $e) {
             http_response_code(401);
-            echo json_encode(["message" => "Accès refusé. Jeton invalide ou expiré."]);
+            echo json_encode([
+                "message" => "Accès refusé par le Middleware.",
+                "error" => $e->getMessage()
+            ]);
             exit;
         }
     }
